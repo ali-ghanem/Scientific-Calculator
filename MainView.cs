@@ -33,10 +33,15 @@ namespace Calculator
             tbInput.Text += b.Text;
         }
 
+        private void on_click_function(object sender, EventArgs e)
+        {
+            Button b = (Button)sender;
+            tbInput.Text += b.Text + "(";
+        }
+
         private void on_click_clear(object sender, EventArgs e)
         {
             tbInput.Clear();
-            lblResult.Text = "";
         }
 
         private void on_click_equal(object sender, EventArgs e)
@@ -54,6 +59,16 @@ namespace Calculator
             Tuple<string, Color> result = calculator.calculate(tbInput.Text);
             lblResult.ForeColor = result.Item2;
             lblResult.Text = result.Item1;
+        }
+
+        private void on_click_copy(object sender, EventArgs e)
+        {
+            Clipboard.SetText(lblResult.Text);
+        }
+
+        private void btnBackSpace_Click(object sender, EventArgs e)
+        {
+            tbInput.Text = tbInput.Text.Remove(tbInput.Text.Length - 1);
         }
     }
 }

@@ -29,15 +29,11 @@ namespace Calculator
             double prev = 0.0;
             int i;
             for (i = index; i > -1; i--)
+                
                 //p: is number, q: dot, r: minus sign, k: minus in 0
                 // p + q + (r * k)
-                // p~ * ~q * (~r + ~k)
-
-                //if ((!Char.IsDigit(text[i]) || (text[i+1] == '-'))&& text[i] != '.' 
-                //    && (text[i] != '-' || (i > 0 && !Char.IsDigit(text[i - 1]))))
-                //    break;
-                if (!Char.IsDigit(text[i]) && text[i] != '.'
-                        && (text[i] != '-' || i != 0))
+                // ~p * ~q * (~r + ~k)
+                if (!Char.IsDigit(text[i]) && text[i] != '.' && (text[i] != '-' || i != 0))
                     break;
 
             Console.WriteLine("in prev: " + text.Substring(i + 1, index - i));
@@ -69,18 +65,24 @@ namespace Calculator
             else return firstNumber - secondNumber;
         }
 
-        private string getNextFunction(string text)
+        private bool contains(string text, string subText)
         {
-            if (text.Contains("sin")) return "sin";
-            else return "cos";
+            return text.IndexOf(subText, StringComparison.OrdinalIgnoreCase) != -1;
         }
 
-        //1+sin(1+2)+1
+        private string getNextFunction(string text)
+        {
+            if (contains(text, "sin")) return "sin";
+            else if (contains(text, "cos")) return "cos";
+            else if (contains(text, "tan")) return "tan";
+            else return null;
+        }
+
         private int getFunctionEnd(string text, int startIndex)
         {
             int count = 0;
             int endIndex;
-
+            Console.WriteLine("in func end:  text: {0},  startIndex: {1}", text,startIndex);
             for (endIndex = text.IndexOf('(', startIndex); endIndex < text.Length; endIndex++)
             {
                 if (text[endIndex] == '(') count++;
@@ -90,16 +92,14 @@ namespace Calculator
             return endIndex;
         }
 
-        private double executeFunc(string func, string text)
+        private double executeFunc(string func, string funcText)
         {
-            int from = text.IndexOf('(') + 1;
-            int to = text.LastIndexOf(')') - from;
-            double value = double.Parse(calc(text.Substring(from, to)));
+            int from = funcText.IndexOf('(') + 1;
+            int to = funcText.LastIndexOf(')') - from;
+            double value = double.Parse(calc(funcText.Substring(from, to)));
             if (func.Equals("sin")) return Math.Sin(value);
-            //else if (func.Equals("cos")) return Math.Cos(value);
-            else return Math.Cos(value);
-
-
+            else if (func.Equals("cos")) return Math.Cos(value);
+            else return Math.Tan(value);
         }
 
 
@@ -115,23 +115,24 @@ namespace Calculator
                 Console.WriteLine(text);
                 string tempText;
 
-                if (thereIsFunction(text))
+                string function = getNextFunction(text);
+                if (function != null)
                 {
-                    string function = getNextFunction(text);
-                    int startIndex = text.IndexOf(function);
+                    int startIndex = text.IndexOf(function, StringComparison.OrdinalIgnoreCase);
                     int endIndex = getFunctionEnd(text, startIndex);
                     string funcText = text.Substring(startIndex, endIndex - startIndex + 1);
-                    Console.WriteLine(string.Format("function: {0}, start: {1}, end: {2}, fText: {3}"
-                        , function, startIndex, endIndex, funcText));
-                    tempText = text.Substring(0, startIndex) + executeFunc(function, funcText);
+                    Console.WriteLine("func: {0}, start: {1}, end: {2}, funcText: {3}",function,startIndex, endIndex, funcText);
+                    tempText = text.Substring(0, startIndex)
+                             + ((startIndex > 0 && Char.IsDigit(text[startIndex - 1])) ? "*" : "") // e.g: 5cos(0) = 5*cos(0)
+                             + executeFunc(function, funcText);
+
                     if (endIndex + 1 < text.Length)
                         tempText += text.Substring(endIndex + 1, text.Length - endIndex - 1);
-                    Console.WriteLine(string.Format("function: {0}, start: {1}, end: {2}, fText: {3}, tText: {4}"
-                        , function, startIndex, endIndex, funcText, tempText));
+
                     return calc(tempText);
                 }
 
-                if (!thereIsOperand(text)) return text;
+                
 
                 if (text.Contains('('))
                 {
@@ -146,20 +147,22 @@ namespace Calculator
                         {
                             endIndex = i;
                             tempText = text.Substring(0, startIndex)
-                                     + ((startIndex > 0 && Char.IsDigit(text[startIndex - 1])) ? "*" : "")
+                                     + ((startIndex > 0 && Char.IsDigit(text[startIndex - 1])) ? "*" : "") // 5(1+2) = 5*(1+2)
                                      + calc(text.Substring(startIndex + 1, endIndex - startIndex - 1));
+                            Console.WriteLine("(: temp: {0}",tempText);
                             if (endIndex + 1 < text.Length)
                                 tempText += text.Substring(endIndex + 1, text.Length - endIndex - 1);
-                            Console.WriteLine("1tT: " + tempText);
                             return calc(tempText);
                         }
                     }
                 }
 
+                if (!thereIsOperand(text)) return text;
+
                 string operand = getNextOperand(text);
 
                 int index = getIndexOfOperand(text, operand);
-                Console.WriteLine("op: {0}  in: {1}", operand, index);
+                //Console.WriteLine("op: {0}  in: {1}", operand, index);
 
                 Tuple<double, int> nextElement = nextNumber(text, index + 1);
                 Tuple<double, int> previousElement = prevNumber(text, index - 1);
@@ -173,7 +176,7 @@ namespace Calculator
                 double result = applyOperand(operand, firstNumber, secondNumber);
 
                 tempText = text.Substring(0, from) + result + text.Substring(to, text.Length - to);
-                Console.WriteLine("2tT: " + tempText);
+                // Console.WriteLine("2tT: " + tempText);
                 return (calc(tempText));
 
             }
@@ -182,19 +185,16 @@ namespace Calculator
                 Console.WriteLine(e.StackTrace);
                 return "invalid syntax";
             }
-
         }
+
         private bool thereIsOperand(string text)
         {
             return text.Contains("*") || text.Contains("+")
-                || (text.Contains("-") && text.LastIndexOf("-") != 0)
+                || (text.Contains("-") && text.LastIndexOf("-") != 0) // in (-5): (-) is not operand
                 || text.Contains("/");
         }
 
-        private bool thereIsFunction(string text)
-        {
-            return text.Contains("sin") || text.Contains("cos");
-        }
+       
 
         public Tuple<string, Color> calculate(string text)
         {
