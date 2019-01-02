@@ -30,6 +30,7 @@ namespace Calculator
         private void on_click_operand(object sender, EventArgs e)
         {
             Button b = (Button)sender;
+            //tbInput.SelectedText += b.Text;
             tbInput.Text += b.Text;
         }
 
@@ -56,9 +57,9 @@ namespace Calculator
 
         private void getResult()
         {
-            Tuple<string, Color> result = calculator.calculate(tbInput.Text);
-            lblResult.ForeColor = result.Item2;
-            lblResult.Text = result.Item1;
+            string result = calculator.calculate(tbInput.Text, out Color color);
+            lblResult.ForeColor = color;
+            lblResult.Text = result;
         }
 
         private void on_click_copy(object sender, EventArgs e)
@@ -70,5 +71,8 @@ namespace Calculator
         {
             tbInput.Text = tbInput.Text.Remove(tbInput.Text.Length - 1);
         }
+
+        
     }
+    // ʃ
 }

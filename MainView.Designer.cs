@@ -44,7 +44,6 @@
             this.button5 = new System.Windows.Forms.Button();
             this.button15 = new System.Windows.Forms.Button();
             this.button16 = new System.Windows.Forms.Button();
-            this.tbInput = new System.Windows.Forms.TextBox();
             this.btnEqual = new System.Windows.Forms.Button();
             this.lblResult = new System.Windows.Forms.Label();
             this.btnCopy = new System.Windows.Forms.Button();
@@ -54,6 +53,8 @@
             this.button18 = new System.Windows.Forms.Button();
             this.button19 = new System.Windows.Forms.Button();
             this.button20 = new System.Windows.Forms.Button();
+            this.button21 = new System.Windows.Forms.Button();
+            this.tbInput = new System.Windows.Forms.RichTextBox();
             this.SuspendLayout();
             // 
             // button1
@@ -268,15 +269,6 @@
             this.button16.UseVisualStyleBackColor = false;
             this.button16.Click += new System.EventHandler(this.on_click_operand);
             // 
-            // tbInput
-            // 
-            this.tbInput.Font = new System.Drawing.Font("Calibri", 16.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.tbInput.Location = new System.Drawing.Point(76, 75);
-            this.tbInput.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.tbInput.Name = "tbInput";
-            this.tbInput.Size = new System.Drawing.Size(449, 40);
-            this.tbInput.TabIndex = 18;
-            // 
             // btnEqual
             // 
             this.btnEqual.BackColor = System.Drawing.Color.DodgerBlue;
@@ -310,10 +302,10 @@
             this.btnCopy.BackColor = System.Drawing.Color.ForestGreen;
             this.btnCopy.Font = new System.Drawing.Font("Calibri", 16.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnCopy.ForeColor = System.Drawing.Color.White;
-            this.btnCopy.Location = new System.Drawing.Point(433, 127);
+            this.btnCopy.Location = new System.Drawing.Point(433, 128);
             this.btnCopy.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.btnCopy.Name = "btnCopy";
-            this.btnCopy.Size = new System.Drawing.Size(92, 40);
+            this.btnCopy.Size = new System.Drawing.Size(130, 40);
             this.btnCopy.TabIndex = 22;
             this.btnCopy.Text = "Copy";
             this.btnCopy.UseVisualStyleBackColor = false;
@@ -398,10 +390,35 @@
             this.button20.UseVisualStyleBackColor = false;
             this.button20.Click += new System.EventHandler(this.on_click_operand);
             // 
+            // button21
+            // 
+            this.button21.BackColor = System.Drawing.Color.White;
+            this.button21.Font = new System.Drawing.Font("Calibri", 13.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.button21.Location = new System.Drawing.Point(487, 194);
+            this.button21.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            this.button21.Name = "button21";
+            this.button21.Size = new System.Drawing.Size(76, 40);
+            this.button21.TabIndex = 29;
+            this.button21.Text = "^";
+            this.button21.UseVisualStyleBackColor = false;
+            this.button21.Click += new System.EventHandler(this.on_click_operand);
+            // 
+            // tbInput
+            // 
+            this.tbInput.Font = new System.Drawing.Font("Calibri", 16.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.tbInput.Location = new System.Drawing.Point(76, 48);
+            this.tbInput.Multiline = false;
+            this.tbInput.Name = "tbInput";
+            this.tbInput.Size = new System.Drawing.Size(487, 56);
+            this.tbInput.TabIndex = 30;
+            this.tbInput.Text = "";
+            // 
             // MainView
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             this.ClientSize = new System.Drawing.Size(623, 495);
+            this.Controls.Add(this.tbInput);
+            this.Controls.Add(this.button21);
             this.Controls.Add(this.button20);
             this.Controls.Add(this.button19);
             this.Controls.Add(this.button18);
@@ -410,7 +427,6 @@
             this.Controls.Add(this.btnBackSpace);
             this.Controls.Add(this.btnCopy);
             this.Controls.Add(this.lblResult);
-            this.Controls.Add(this.tbInput);
             this.Controls.Add(this.btnEqual);
             this.Controls.Add(this.button5);
             this.Controls.Add(this.button15);
@@ -458,7 +474,6 @@
         private System.Windows.Forms.Button button5;
         private System.Windows.Forms.Button button15;
         private System.Windows.Forms.Button button16;
-        private System.Windows.Forms.TextBox tbInput;
         private System.Windows.Forms.Button btnEqual;
         private System.Windows.Forms.Label lblResult;
         private System.Windows.Forms.Button btnCopy;
@@ -468,6 +483,8 @@
         private System.Windows.Forms.Button button18;
         private System.Windows.Forms.Button button19;
         private System.Windows.Forms.Button button20;
+        private System.Windows.Forms.Button button21;
+        private System.Windows.Forms.RichTextBox tbInput;
     }
 }
 
