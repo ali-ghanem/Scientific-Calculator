@@ -14,6 +14,7 @@ namespace Calculator
     {
         Calculator calculator;
 
+
         public MainView()
         {
             InitializeComponent();
@@ -24,30 +25,75 @@ namespace Calculator
         private void on_click_number(object sender, EventArgs e)
         {
             Button b = (Button)sender;
-            tbInput.Text += b.Text;
+            tbInput.AppendText(b.Text);
+
         }
 
         private void on_click_operand(object sender, EventArgs e)
         {
             Button b = (Button)sender;
-            //tbInput.SelectedText += b.Text;
-            tbInput.Text += b.Text;
+            tbInput.AppendText(b.Text);
+            ActiveControl = tbInput;
         }
 
         private void on_click_function(object sender, EventArgs e)
         {
             Button b = (Button)sender;
-            tbInput.Text += b.Text + "(";
+            tbInput.AppendText(b.Text + '(');
+            ActiveControl = tbInput;
         }
 
-        private void on_click_clear(object sender, EventArgs e)
+        private void on_click_inverse_function(object sender, EventArgs e)
         {
-            tbInput.Clear();
+            Button b = (Button)sender;
+            string func = b.Text.Substring(0, 3);
+            tbInput.AppendText("arc" + func + "(");
+            ActiveControl = tbInput;
+        }
+
+        private void on_click_backspace(object sender, EventArgs e)
+        {
+            tbInput.Text = tbInput.Text.Remove(tbInput.Text.Length - 1);
+        }
+
+        private void on_click_log(object sender, EventArgs e)
+        {
+            tbInput.AppendText("log[10](");
+            ActiveControl = tbInput;
+        }
+
+        private void on_click_root(object sender, EventArgs e)
+        {
+            tbInput.AppendText("√[2](");
+            ActiveControl = tbInput;
+        }
+
+        private void on_click_factorial(object sender, EventArgs e)
+        {
+            tbInput.AppendText("!");
+            ActiveControl = tbInput;
         }
 
         private void on_click_equal(object sender, EventArgs e)
         {
             getResult();
+        }
+
+        private void on_click_ans(object sender, EventArgs e)
+        {
+            tbInput.AppendText(lblResult.Text);
+            ActiveControl = tbInput;
+        }
+
+        private void on_click_clear(object sender, EventArgs e)
+        {
+            tbInput.Clear();
+            ActiveControl = tbInput;
+        }
+
+        private void on_click_copy(object sender, EventArgs e)
+        {
+            Clipboard.SetText(lblResult.Text);
         }
 
         private void keyDown(object sender, KeyEventArgs e)
@@ -61,18 +107,7 @@ namespace Calculator
             lblResult.ForeColor = color;
             lblResult.Text = result;
         }
-
-        private void on_click_copy(object sender, EventArgs e)
-        {
-            Clipboard.SetText(lblResult.Text);
-        }
-
-        private void btnBackSpace_Click(object sender, EventArgs e)
-        {
-            tbInput.Text = tbInput.Text.Remove(tbInput.Text.Length - 1);
-        }
-
-        
+   
     }
     // ʃ
 }
