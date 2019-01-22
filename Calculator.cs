@@ -142,7 +142,7 @@ namespace Calculator
         {
             try
             {
-                // clean text
+                // clean text:
                 text = Regex.Replace(text, @"\s+", "");
                 text = text.Replace("--", "+");
                 text = text.Replace("-+", "-");
@@ -150,15 +150,6 @@ namespace Calculator
                 text = text.Replace("π", "3.1415926535897932384626433832795");
 
                 string tempText;
-
-                if (text.Contains("!"))
-                {
-                    int indx = text.IndexOf("!");
-                    double number = prevNumber(text, indx - 1, out int from);
-                    double res = factorial(number);
-                    tempText = text.Substring(0, from) + res + text.Substring(indx + 1, text.Length - indx - 1);
-                    return calc(tempText);
-                }
 
                 string function = getNextFunction(text);
                 if (function != null)
@@ -175,8 +166,6 @@ namespace Calculator
 
                     return calc(tempText);
                 }
-
-
 
                 if (text.Contains('('))
                 {
@@ -200,6 +189,15 @@ namespace Calculator
                     }
                 }
 
+                if (text.Contains("!"))
+                {
+                    int indx = text.IndexOf("!");
+                    double number = prevNumber(text, indx - 1, out int from);
+                    long res = factorial((int)number);
+                    tempText = text.Substring(0, from) + res + text.Substring(indx + 1, text.Length - indx - 1);
+                    return calc(tempText);
+                }
+
                 string operand = getNextOperand(text);
                 if (operand != null)
                 {
@@ -221,10 +219,10 @@ namespace Calculator
             }
         }
 
-        public double factorial(double number)
+        public long factorial(int number)
         {
-            double n = 1;
-            for (double i = number; i > 1; i--)
+            long n = 1;
+            for (int i = number; i > 1; i--)
                 n *= i;
             return n;
         }
