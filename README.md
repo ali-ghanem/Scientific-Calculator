@@ -1,5 +1,5 @@
 # Scientific-Calculator
 
-still in development 
+Scientific calculator with WPF Visual Studio 2017
 
-to try the calculator click <a href="https://github.com/ali-ghanem/Scientific-Calculator/blob/master/bin/Debug/Calculator.exe?raw=true"> here</a>.
+to download it click <a href="https://github.com/ali-ghanem/Scientific-Calculator/blob/master/bin/Debug/Calculator.exe?raw=true"> here</a>.
