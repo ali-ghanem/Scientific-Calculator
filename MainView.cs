@@ -81,7 +81,7 @@ namespace Calculator
 
         private void on_click_ans(object sender, EventArgs e)
         {
-            tbInput.AppendText(lblResult.Text);
+            tbInput.AppendText(tbResult.Text);
             ActiveControl = tbInput;
         }
 
@@ -91,23 +91,30 @@ namespace Calculator
             ActiveControl = tbInput;
         }
 
-        private void on_click_copy(object sender, EventArgs e)
-        {
-            Clipboard.SetText(lblResult.Text);
-        }
-
         private void keyDown(object sender, KeyEventArgs e)
         {
-            if (e.KeyCode == Keys.Enter) getResult();
+            if (e.KeyCode == Keys.Enter)
+            {
+                e.Handled = e.SuppressKeyPress = true; // disable the beep sound 
+                getResult();
+            }
         }
 
         private void getResult()
         {
             string result = calculator.calculate(tbInput.Text, out Color color);
-            lblResult.ForeColor = color;
-            lblResult.Text = result;
+            tbResult.ForeColor = color;
+            tbResult.Text = result;
+
         }
-   
+
+
+        private void textBox1_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            e.Handled = true;
+      
+        }
+
     }
     // ʃ
 }
