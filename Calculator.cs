@@ -115,7 +115,7 @@ namespace Calculator
             {
                 int f = funcText.IndexOf('[') + 1;
                 int t = funcText.IndexOf(']') - f;
-                double rootBase = double.Parse(calc(funcText.Substring(f, t)));
+                double rootBase = double.Parse(funcText.Substring(f, t));
                 return Math.Pow(value, 1 / rootBase);
             }
 
@@ -123,7 +123,7 @@ namespace Calculator
             {//e.g: log[10](8+2)
                 int f = funcText.IndexOf('[') + 1;
                 int t = funcText.IndexOf(']') - f;
-                double logBase = double.Parse(calc(funcText.Substring(f, t)));
+                double logBase = double.Parse(funcText.Substring(f, t));
                 return Math.Log(value, logBase);
             }
 
@@ -150,6 +150,31 @@ namespace Calculator
                 text = text.Replace("π", "3.1415926535897932384626433832795");
 
                 string tempText;
+
+                // claculate the base e.g: log[1+1](8) = log[2](8)
+                if (text.Contains('['))
+                {
+                    int startIndex = text.IndexOf('[');
+                    int endIndex, count = 1;
+                    for (endIndex = startIndex + 1; endIndex < text.Length; endIndex++)
+                    {
+                        if (text[endIndex] == '[') count++;
+                        else if (text[endIndex] == ']') count--;
+                        if (count == 0) break;
+                    }
+                    // log[2+1](5)
+                    string baseText = text.Substring(startIndex + 1, endIndex - startIndex - 1);
+                    string func = getNextFunction(baseText);
+                    string op = getNextOperand(baseText);
+                    if (func != null || op != null || baseText.Contains('!'))
+                    {
+                        tempText = text.Substring(0, startIndex + 1)
+                                 + calc(baseText)
+                                 + text.Substring(endIndex, text.Length - endIndex);
+                        return calc(tempText);
+                    }
+                }
+
 
                 string function = getNextFunction(text);
                 if (function != null)
@@ -214,7 +239,7 @@ namespace Calculator
             }
             catch (Exception e)
             {
-                Console.WriteLine(e.StackTrace);
+                // Console.WriteLine(e.StackTrace);
                 return "invalid syntax";
             }
         }
