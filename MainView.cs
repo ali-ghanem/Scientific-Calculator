@@ -13,7 +13,8 @@ namespace Calculator
     public partial class MainView : Form
     {
         Calculator calculator;
-
+        int caretIndex;
+        string newText;
 
         public MainView()
         {
@@ -25,30 +26,46 @@ namespace Calculator
         private void on_click_number(object sender, EventArgs e)
         {
             Button b = (Button)sender;
-            tbInput.AppendText(b.Text);
-
+            caretIndex = tbInput.SelectionStart;
+            newText = tbInput.Text.Substring(0, caretIndex) + b.Text + tbInput.Text.Substring(caretIndex, tbInput.Text.Length - caretIndex);
+            tbInput.Text = newText;
+            ActiveControl = tbInput;
+            tbInput.SelectionStart = caretIndex + 1;
+            tbInput.SelectionLength = 0;
         }
 
         private void on_click_operand(object sender, EventArgs e)
         {
             Button b = (Button)sender;
-            tbInput.AppendText(b.Text);
+            caretIndex = tbInput.SelectionStart;
+            newText = tbInput.Text.Substring(0, caretIndex) + b.Text + tbInput.Text.Substring(caretIndex, tbInput.Text.Length - caretIndex);
+            tbInput.Text = newText;
             ActiveControl = tbInput;
+            tbInput.SelectionStart = caretIndex + 1;
+            tbInput.SelectionLength = 0;
         }
 
         private void on_click_function(object sender, EventArgs e)
         {
             Button b = (Button)sender;
-            tbInput.AppendText(b.Text + '(');
+            caretIndex = tbInput.SelectionStart;
+            newText = tbInput.Text.Substring(0, caretIndex) + b.Text + '(' + tbInput.Text.Substring(caretIndex, tbInput.Text.Length - caretIndex);
+            tbInput.Text = newText;
             ActiveControl = tbInput;
+            tbInput.SelectionStart = caretIndex + 4;
+            tbInput.SelectionLength = 0;
         }
 
         private void on_click_inverse_function(object sender, EventArgs e)
         {
             Button b = (Button)sender;
             string func = b.Text.Substring(0, 3);
-            tbInput.AppendText("arc" + func + "(");
+            caretIndex = tbInput.SelectionStart;
+            newText = tbInput.Text.Substring(0, caretIndex) + "arc" + func + "(" + tbInput.Text.Substring(caretIndex, tbInput.Text.Length - caretIndex);
+            tbInput.Text = newText;
             ActiveControl = tbInput;
+            tbInput.SelectionStart = caretIndex + 7;
+            tbInput.SelectionLength = 0;
         }
 
         private void on_click_backspace(object sender, EventArgs e)
@@ -58,20 +75,33 @@ namespace Calculator
 
         private void on_click_log(object sender, EventArgs e)
         {
-            tbInput.AppendText("log[10](");
+            caretIndex = tbInput.SelectionStart;
+            newText = tbInput.Text.Substring(0, caretIndex) + "log[10](" + tbInput.Text.Substring(caretIndex, tbInput.Text.Length - caretIndex);
+            tbInput.Text = newText;
             ActiveControl = tbInput;
+            tbInput.SelectionStart = caretIndex + 8;
+            tbInput.SelectionLength = 0;
         }
 
         private void on_click_root(object sender, EventArgs e)
         {
-            tbInput.AppendText("√[2](");
+            caretIndex = tbInput.SelectionStart;
+            newText = tbInput.Text.Substring(0, caretIndex)+ "√[2]("+tbInput.Text.Substring(caretIndex,tbInput.Text.Length-caretIndex);
+            tbInput.Text = newText;
             ActiveControl = tbInput;
+            tbInput.SelectionStart = caretIndex + 5;
+            tbInput.SelectionLength = 0;
         }
 
         private void on_click_factorial(object sender, EventArgs e)
         {
-            tbInput.AppendText("!");
+            Button b = (Button)sender;
+            caretIndex = tbInput.SelectionStart;
+            newText = tbInput.Text.Substring(0, caretIndex) + "!" + tbInput.Text.Substring(caretIndex, tbInput.Text.Length - caretIndex);
+            tbInput.Text = newText;
             ActiveControl = tbInput;
+            tbInput.SelectionStart = caretIndex + 1;
+            tbInput.SelectionLength = 0;
         }
 
         private void on_click_equal(object sender, EventArgs e)
@@ -81,8 +111,12 @@ namespace Calculator
 
         private void on_click_ans(object sender, EventArgs e)
         {
-            tbInput.AppendText(tbResult.Text);
+            caretIndex = tbInput.SelectionStart;
+            newText = tbInput.Text.Substring(0, caretIndex) + tbResult.Text + tbInput.Text.Substring(caretIndex, tbInput.Text.Length - caretIndex);
+            tbInput.Text = newText;
             ActiveControl = tbInput;
+            tbInput.SelectionStart = caretIndex + tbResult.Text.Length;
+            tbInput.SelectionLength = 0;
         }
 
         private void on_click_clear(object sender, EventArgs e)
@@ -100,21 +134,22 @@ namespace Calculator
             }
         }
 
+        private void tbResult_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            // preventing user from editing the result text box
+            if (e.KeyChar != 'c' - 96) // except: CTRL + C (copy result)
+            {
+                e.Handled = true; 
+            }
+        }
+
         private void getResult()
         {
             string result = calculator.calculate(tbInput.Text, out Color color);
             tbResult.ForeColor = color;
             tbResult.Text = result;
-
         }
-
-
-        private void textBox1_KeyPress(object sender, KeyPressEventArgs e)
-        {
-            e.Handled = true;
-      
-        }
-
+  
     }
     // ʃ
 }

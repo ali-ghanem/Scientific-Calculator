@@ -18,3 +18,8 @@ D:\VisualStudio\Calculator\Calculator\obj\Debug\Calculator.pdb
 D:\VisualStudio\Calculator\Calculator\bin\Debug\Calculator.exe.config
 D:\VisualStudio\Calculator\Calculator\bin\Debug\Calculator.exe
 D:\VisualStudio\Calculator\Calculator\bin\Debug\Calculator.pdb
+D:\VisualStudio\Calculator\Calculator\bin\Debug\Calculator.exe.manifest
+D:\VisualStudio\Calculator\Calculator\bin\Debug\Calculator.application
+D:\VisualStudio\Calculator\Calculator\obj\Debug\Calculator.TrustInfo.xml
+D:\VisualStudio\Calculator\Calculator\obj\Debug\Calculator.exe.manifest
+D:\VisualStudio\Calculator\Calculator\obj\Debug\Calculator.application

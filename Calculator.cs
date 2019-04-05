@@ -11,7 +11,7 @@ namespace Calculator
     class Calculator
     {
 
-        private double prevNumber(String text, int index, out int from)
+        private double prevNumber(ref String text, int index, out int from)
         {
             double prev = 0.0;
             int i;
@@ -28,7 +28,7 @@ namespace Calculator
             return prev;
         }
 
-        private double nextNumber(String text, int index, out int to)
+        private double nextNumber(ref String text, int index, out int to)
         {
             double next = 0.0;
             int i;
@@ -55,7 +55,7 @@ namespace Calculator
 
         private int getIndexOfOperand(string text, string operand)
         {
-            if (operand.Equals("-")) return text.IndexOf("-", 1);
+            if (operand.Equals("-")) return text.IndexOf("-", 1); // ignore the minus sign if it was at the beginning (-1+2)
             else return text.IndexOf(operand);
         }
 
@@ -137,109 +137,134 @@ namespace Calculator
             else throw new Exception();
         }
 
+        private void cleanText(ref string text)
+        {
+            text = Regex.Replace(text, @"\s+", ""); // remove white spaces
+
+            var pattern1 = new Regex(@"\)\d"); // error: (1+2)5
+            if (pattern1.IsMatch(text)) throw new Exception();
+
+            var pattern2 = new Regex(@"!\d"); // error: 2!5
+            if (pattern2.IsMatch(text)) throw new Exception();
+
+            var pattern3 = new Regex(@"π\d"); // error: π5
+            if (pattern3.IsMatch(text)) throw new Exception();
+
+            // number of '(' must be equal to number of ')'
+            int lp = text.Count(x => x == '(');
+            int rp = text.Count(x => x == ')');
+            if (lp != rp) throw new Exception();
+
+            text = text.Replace("--", "+");
+            text = text.Replace("-+", "-");
+            text = text.Replace("+-", "-");
+            text = text.Replace("π", "3.1415926535897932384626433832795");
+        }
+
+        private void calcBrackets(ref string text)
+        {
+            int startIndex = text.IndexOf('[');
+            int endIndex, count = 1;
+
+            for (endIndex = startIndex + 1; endIndex < text.Length; endIndex++)
+            {
+                if (text[endIndex] == '[') count++;
+                else if (text[endIndex] == ']') count--;
+                if (count == 0) break;
+            }
+            // log[2+1](5)
+            string baseText = text.Substring(startIndex + 1, endIndex - startIndex - 1);
+            string func = getNextFunction(baseText);
+            string op = getNextOperand(baseText);
+            if (func != null || op != null || baseText.Contains('!'))
+            {
+                string tempText = text.Substring(0, startIndex + 1)
+                                + calc(baseText)
+                                + text.Substring(endIndex, text.Length - endIndex);
+                text = tempText;
+            }
+        }
+
+        private void calcFunction(ref string text, string function)
+        {
+            int startIndex = text.IndexOf(function, StringComparison.OrdinalIgnoreCase);
+            int endIndex = getFunctionEnd(text, startIndex);
+            string funcText = text.Substring(startIndex, endIndex - startIndex + 1);
+            string tempText = text.Substring(0, startIndex)
+                     + ((startIndex > 0 && Char.IsDigit(text[startIndex - 1])) ? "*" : "") // e.g: 5cos(0) = 5*cos(0)
+                     + executeFunction(function, funcText);
+
+            if (endIndex + 1 < text.Length)
+                tempText += text.Substring(endIndex + 1, text.Length - endIndex - 1);
+            text = calc(tempText);
+        }
+
+        private void calcParentheses(ref string text)
+        {
+            int startIndex = text.IndexOf('(');
+            int endIndex = text.IndexOf(')');
+
+            for (int i = 0; i < text.Length; i++)
+            {
+                if (text[i] == '(') startIndex = i;
+
+                else if (text[i] == ')')
+                {
+                    endIndex = i;
+                    string tempText = text.Substring(0, startIndex)
+                             + ((startIndex > 0 && Char.IsDigit(text[startIndex - 1])) ? "*" : "") // 5(1+2) = 5*(1+2)
+                             + calc(text.Substring(startIndex + 1, endIndex - startIndex - 1));
+                    if (endIndex + 1 < text.Length)
+                        tempText += text.Substring(endIndex + 1, text.Length - endIndex - 1);
+                    text = calc(tempText);
+                }
+            }
+        }
+
+        private void calcFactorial(ref string text)
+        {
+            int indx = text.IndexOf("!");
+            double number = prevNumber(ref text, indx - 1, out int from);
+            long res = factorial((int)number);
+            string tempText = text.Substring(0, from) + res + text.Substring(indx + 1, text.Length - indx - 1);
+            text = calc(tempText);
+        }
+
+        private void calcOperand(ref string text, string operand)
+        {
+            int index = getIndexOfOperand(text, operand);
+            double firstNumber = prevNumber(ref text, index - 1, out int from);
+            double secondNumber = nextNumber(ref text, index + 1, out int to);
+
+            double result = applyOperand(operand, firstNumber, secondNumber);
+
+            string tempText = text.Substring(0, from) + result + text.Substring(to, text.Length - to);
+            text = calc(tempText);
+        }
 
         private string calc(string text)
         {
             try
             {
-                // clean text:
-                text = Regex.Replace(text, @"\s+", "");
-                text = text.Replace("--", "+");
-                text = text.Replace("-+", "-");
-                text = text.Replace("+-", "-");
-                text = text.Replace("π", "3.1415926535897932384626433832795");
+                cleanText(ref text);
 
-                string tempText;
-
-                // claculate the base e.g: log[1+1](8) = log[2](8)
-                if (text.Contains('['))
-                {
-                    int startIndex = text.IndexOf('[');
-                    int endIndex, count = 1;
-                    for (endIndex = startIndex + 1; endIndex < text.Length; endIndex++)
-                    {
-                        if (text[endIndex] == '[') count++;
-                        else if (text[endIndex] == ']') count--;
-                        if (count == 0) break;
-                    }
-                    // log[2+1](5)
-                    string baseText = text.Substring(startIndex + 1, endIndex - startIndex - 1);
-                    string func = getNextFunction(baseText);
-                    string op = getNextOperand(baseText);
-                    if (func != null || op != null || baseText.Contains('!'))
-                    {
-                        tempText = text.Substring(0, startIndex + 1)
-                                 + calc(baseText)
-                                 + text.Substring(endIndex, text.Length - endIndex);
-                        return calc(tempText);
-                    }
-                }
-
+                // calculate the base e.g: log[1+1](8) = log[2](8)
+                if (text.Contains('[')) calcBrackets(ref text);
 
                 string function = getNextFunction(text);
-                if (function != null)
-                {
-                    int startIndex = text.IndexOf(function, StringComparison.OrdinalIgnoreCase);
-                    int endIndex = getFunctionEnd(text, startIndex);
-                    string funcText = text.Substring(startIndex, endIndex - startIndex + 1);
-                    tempText = text.Substring(0, startIndex)
-                             + ((startIndex > 0 && Char.IsDigit(text[startIndex - 1])) ? "*" : "") // e.g: 5cos(0) = 5*cos(0)
-                             + executeFunction(function, funcText);
+                if (function != null) calcFunction(ref text, function);
+                    
+                if (text.Contains('(')) calcParentheses(ref text);
 
-                    if (endIndex + 1 < text.Length)
-                        tempText += text.Substring(endIndex + 1, text.Length - endIndex - 1);
-
-                    return calc(tempText);
-                }
-
-                if (text.Contains('('))
-                {
-                    int startIndex = text.IndexOf('(');
-                    int endIndex = text.IndexOf(')');
-
-                    for (int i = 0; i < text.Length; i++)
-                    {
-                        if (text[i] == '(') startIndex = i;
-
-                        else if (text[i] == ')')
-                        {
-                            endIndex = i;
-                            tempText = text.Substring(0, startIndex)
-                                     + ((startIndex > 0 && Char.IsDigit(text[startIndex - 1])) ? "*" : "") // 5(1+2) = 5*(1+2)
-                                     + calc(text.Substring(startIndex + 1, endIndex - startIndex - 1));
-                            if (endIndex + 1 < text.Length)
-                                tempText += text.Substring(endIndex + 1, text.Length - endIndex - 1);
-                            return calc(tempText);
-                        }
-                    }
-                }
-
-                if (text.Contains("!"))
-                {
-                    int indx = text.IndexOf("!");
-                    double number = prevNumber(text, indx - 1, out int from);
-                    long res = factorial((int)number);
-                    tempText = text.Substring(0, from) + res + text.Substring(indx + 1, text.Length - indx - 1);
-                    return calc(tempText);
-                }
-
+                if (text.Contains("!")) calcFactorial(ref text);
+                
                 string operand = getNextOperand(text);
-                if (operand != null)
-                {
-                    int index = getIndexOfOperand(text, operand);
-                    double firstNumber = prevNumber(text, index - 1, out int from);
-                    double secondNumber = nextNumber(text, index + 1, out int to);
+                if (operand != null) calcOperand(ref text, operand);    
 
-                    double result = applyOperand(operand, firstNumber, secondNumber);
-
-                    tempText = text.Substring(0, from) + result + text.Substring(to, text.Length - to);
-                    return (calc(tempText));
-                }
                 return text;
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                // Console.WriteLine(e.StackTrace);
                 return "invalid syntax";
             }
         }
